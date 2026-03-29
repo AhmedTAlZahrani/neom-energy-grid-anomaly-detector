@@ -1,5 +1,7 @@
 # NEOM Energy Grid Anomaly Detector
 
+![Quality Checks](https://github.com/AhmedTAlZahrani/neom-energy-grid-anomaly-detector/actions/workflows/checks.yml/badge.svg)
+
 Real-time anomaly detection for a simulated 100% renewable energy microgrid.
 The system ingests one-minute-interval sensor telemetry from solar arrays, wind
 turbines, battery banks, and hydrogen electrolyzers, then flags operational
