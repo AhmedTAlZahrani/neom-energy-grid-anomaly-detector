@@ -1,9 +1,15 @@
+import logging
 import threading
 import queue
 import time
 
 import numpy as np
 import pandas as pd
+
+from .logging_conf import setup as setup_logging
+
+setup_logging()
+logger = logging.getLogger("anomaly_detector")
 
 
 class StreamProcessor:
@@ -41,6 +47,7 @@ class StreamProcessor:
             target=self._consume_loop, daemon=True
         )
         self._consumer_thread.start()
+        logger.info("StreamProcessor started (consumer thread running)")
         print("StreamProcessor started (consumer thread running)")
 
     def stop(self):
@@ -48,6 +55,7 @@ class StreamProcessor:
         self._running = False
         if self._consumer_thread is not None:
             self._consumer_thread.join(timeout=5)
+        logger.info("StreamProcessor stopped | Processed %d windows", self._processed_count)
         print(f"StreamProcessor stopped | Processed {self._processed_count} windows")
 
     def publish(self, record):
@@ -61,6 +69,7 @@ class StreamProcessor:
         try:
             self._queue.put(record, timeout=1)
         except queue.Full:
+            logger.warning("Stream buffer full, dropping record")
             print("WARNING: Stream buffer full, dropping record")
 
     def publish_batch(self, df):
@@ -183,6 +192,7 @@ class StreamProcessor:
         ss = step_size or self.step_size
         results = []
 
+        logger.debug("Batch processing %d records (window=%d, step=%d)", len(df), ws, ss)
         print(f"Batch processing {len(df)} records (window={ws}, step={ss})...")
 
         for start in range(0, len(df) - ws + 1, ss):
